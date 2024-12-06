@@ -1,0 +1,44 @@
+{
+  "name": "reactdnd-menu-structure",
+  "version": "1.0.0",
+  "author": "Lakshman Gope",
+  "description": "WordPress Like Menu Builder with React and React-DnD",
+  "homepage": "https://github.com/lgope/reactdnd-menu-structure",
+
+  "license": "ISC",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lgope/reactdnd-menu-structure.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lgope/reactdnd-menu-structure/issues"
+  },
+  "dependencies": {
+    "classnames": "^2.5.1",
+    "lodash": "^4.17.21",
+    "react": "^18.3.1",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.15.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react-swc": "^3.5.0",
+    "eslint": "^9.15.0",
+    "eslint-plugin-react": "^7.37.2",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.14",
+    "globals": "^15.12.0",
+    "vite": "^6.0.1"
+  }
+}
