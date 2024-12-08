@@ -32,7 +32,7 @@ const initMenus = [
         id: "Sub Item 4",
         name: "Sub Item 4",
         href: "/sub-item-4",
-      }
+      },
     ],
   },
   {
@@ -62,7 +62,15 @@ const initMenus = [
 function App() {
   const [menus, setMenus] = useState(initMenus);
 
-  return <MenuBuilder items={menus} setItems={setMenus} />;
+  return (
+    <div>
+      <h1>Main</h1>
+      <br />
+      <hr />
+      <br />
+      <MenuBuilder items={menus} setItems={setMenus} />
+    </div>
+  );
 }
 
 export default App;

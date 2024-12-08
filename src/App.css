@@ -27,14 +27,14 @@
   min-width: 414px;
 }
 
-.Wrapper.ghost.indicator {
+.Wrapper.dragging.indicator {
   opacity: 1;
   position: relative;
   z-index: 1;
   margin-bottom: -1px;
 }
 
-.Wrapper.ghost.indicator .TreeItem {
+.Wrapper.dragging.indicator .TreeItem {
   position: relative;
   width: "100%";
   max-width: 414px;
@@ -45,16 +45,16 @@
   background-color: #fff;
 }
 
-.Wrapper.ghost.indicator .TreeItem > * {
+.Wrapper.dragging.indicator .TreeItem > * {
   opacity: 0;
   height: 0;
 }
 
-.Wrapper.ghost:not(.indicator) {
+.Wrapper.dragging:not(.indicator) {
   opacity: 0.5;
 }
 
-.Wrapper.ghost .TreeItem > * {
+.Wrapper.dragging .TreeItem > * {
   box-shadow: none;
   background-color: transparent;
 }

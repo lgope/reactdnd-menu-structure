@@ -4,7 +4,6 @@
   "author": "Lakshman Gope",
   "description": "WordPress Like Menu Builder with React and React-DnD",
   "homepage": "https://github.com/lgope/reactdnd-menu-structure",
-
   "license": "ISC",
   "private": true,
   "type": "module",
@@ -23,6 +22,7 @@
   },
   "dependencies": {
     "classnames": "^2.5.1",
+    "immutability-helper": "^3.1.1",
     "lodash": "^4.17.21",
     "react": "^18.3.1",
     "react-dnd": "^16.0.1",

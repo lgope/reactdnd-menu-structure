@@ -1,21 +1,55 @@
-import cloneDeep from 'lodash/cloneDeep';
-export const iOS = /iPad|iPhone|iPod/.test(navigator.platform);
+import cloneDeep from "lodash/cloneDeep";
+import update from "immutability-helper";
 
-export const arrayMove = (prevArray, dragIndex, dropIndex) => {
-	if (dragIndex === dropIndex) return prevArray;
+// export function arrayMove(array, from, to) {
+//   const newArray = array.slice();
+//   newArray.splice(
+//     to < 0 ? newArray.length + to : to,
+//     0,
+//     newArray.splice(from, 1)[0]
+//   );
 
-	let temp_arr = cloneDeep(prevArray);
-	if (dragIndex > dropIndex) {
-		let temp = temp_arr[dragIndex];
-		prevArray.splice(dragIndex, 1);
-		prevArray.splice(dropIndex, 0, temp);
-	} else {
-		prevArray.splice(dropIndex + 1, 0, temp_arr[dragIndex]);
-		prevArray.splice(dragIndex, 1);
-	}
-	return prevArray;
+//   return newArray;
+// }
+
+// export const arrayMove = (prevArray, dragIndex, dropIndex) => {
+//   if (dragIndex === dropIndex) return prevArray;
+//   let temp_arr = cloneDeep(prevArray);
+//   if (dragIndex > dropIndex) {
+//     let temp = temp_arr[dragIndex];
+//     prevArray.splice(dragIndex, 1);
+//     prevArray.splice(dropIndex, 0, temp);
+//   } else {
+//     prevArray.splice(dropIndex + 1, 0, temp_arr[dragIndex]);
+//     prevArray.splice(dragIndex, 1);
+//   }
+//   return prevArray;
+// };
+
+/**
+ *
+ * @param {*} array
+ * @param {*} from
+ * @param {*} to
+ * @returns
+ *
+ * Example:
+ * const array = ['a', 'b', 'c', 'd', 'e'];
+ * console.log(arrayMove(array, -1, 1)); // ['a', 'e', 'b', 'c', 'd']
+ */
+
+export const arrayMove = (array, from, to) => {
+  const length = array.length;
+  const fromIndex = ((from % length) + length) % length;
+  const toIndex = ((to % length) + length) % length;
+
+  return update(array, {
+    $splice: [
+      [fromIndex, 1],
+      [toIndex, 0, array[fromIndex]],
+    ],
+  });
 };
-
 
 function getDragDepth(offset, indentationWidth) {
   return Math.round(offset / indentationWidth);
@@ -36,7 +70,7 @@ export function getProjection(
 
   const previousItem = newItems[overItemIndex - 1];
   const nextItem = newItems[overItemIndex + 1];
-  
+
   const dragDepth = getDragDepth(dragOffset, indentationWidth);
 
   const projectedDepth = activeItem.depth + dragDepth;
@@ -94,11 +128,7 @@ function getMinDepth({ nextItem }) {
   return 0;
 }
 
-function flatten(
-  items,
-  parentId,
-  depth = 0
-) {
+function flatten(items, parentId, depth = 0) {
   return items.reduce((acc, item, index) => {
     return [
       ...acc,
@@ -113,7 +143,7 @@ export function flattenTree(items) {
 }
 
 export function buildTree(flattenedItems) {
-  const root = { id: 'root', children: [], name: 'root' };
+  const root = { id: "root", children: [], name: "root" };
   const nodes = { [root.id]: root };
   const items = flattenedItems.map((item) => ({ ...item, children: [] }));
 
@@ -133,10 +163,7 @@ export function findItem(items, itemId) {
   return items.find(({ id }) => id === itemId);
 }
 
-export function findItemDeep(
-  items,
-  itemId
-) {
+export function findItemDeep(items, itemId) {
   for (const item of items) {
     const { id, children } = item;
 
@@ -174,12 +201,7 @@ export function removeItem(items, id) {
   return newItems;
 }
 
-export function setProperty(
-  items,
-  id,
-  property,
-  setter
-) {
+export function setProperty(items, id, property, setter) {
   for (const item of items) {
     if (item.id === id) {
       item[property] = setter(item[property]);
@@ -194,7 +216,7 @@ export function setProperty(
   return [...items];
 }
 
-function countChildren(items, count = 0){
+function countChildren(items, count = 0) {
   return items.reduce((acc, { children }) => {
     if (children.length) {
       return countChildren(children, acc + 1);
@@ -216,10 +238,7 @@ export function getChildrens(items, id) {
   return item ? item.children : [];
 }
 
-export function removeChildrenOf(
-  items,
-  ids
-) {
+export function removeChildrenOf(items, ids) {
   const excludeParentIds = [...ids];
 
   return items.filter((item) => {

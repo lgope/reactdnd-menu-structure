@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   buildTree,
@@ -9,10 +9,9 @@ import {
   removeChildrenOf,
   setProperty,
   getChildrens,
+  arrayMove,
 } from "./utilities";
 import { SortableTreeItem } from "./components";
-
-const arrayMove = (array, from, to) => {};
 
 export function MenuBuilder({
   style = "bordered",
@@ -25,25 +24,10 @@ export function MenuBuilder({
   const [overId, setOverId] = useState(null);
   const [offsetLeft, setOffsetLeft] = useState(0);
 
-  function updateItem(id, data, items) {
-    const newItems = [];
-
-    for (const item of items) {
-      if (item.id === id) {
-        item.id = data.id;
-        item.name = data.name;
-        item.href = data.href;
-      }
-
-      if (item?.children?.length) {
-        item.children = updateItem(id, data, item.children);
-      }
-
-      newItems.push(item);
-    }
-
-    return newItems;
-  }
+  const dragData = useRef({
+    dragId: null,
+    hoverId: null,
+  });
 
   const flattenedItems = useMemo(() => {
     const flattenedTree = flattenTree(items);
@@ -59,7 +43,7 @@ export function MenuBuilder({
     );
   }, [activeId, items]);
 
-  const projected =
+  let projected =
     activeId && overId
       ? getProjection(
           flattenedItems,
@@ -70,26 +54,31 @@ export function MenuBuilder({
         )
       : null;
 
-  const sensorContext = useRef({
-    items: flattenedItems,
-    offset: offsetLeft,
-  });
+  const handleOnHover = (dragId, hoverId, deltaX) => {
+    dragData.current = { ...dragData.current, hoverId };
+    const { depth, parentId } = getProjection(
+      flattenedItems,
+      dragId,
+      hoverId,
+      deltaX,
+      indentationWidth
+    );
 
-  const sortedIds = useMemo(
-    () => flattenedItems.map(({ id }) => id),
-    [flattenedItems]
-  );
-  
-  const activeItem = activeId
-    ? flattenedItems.find(({ id }) => id === activeId)
-    : null;
+    projected = { depth, parentId };
 
-  useEffect(() => {
-    sensorContext.current = {
-      items: flattenedItems,
-      offset: offsetLeft,
-    };
-  }, [flattenedItems, offsetLeft]);
+    const clonedItems = JSON.parse(JSON.stringify(flattenTree(items)));
+
+    const overIndex = clonedItems.findIndex(({ id }) => id === hoverId);
+    const activeIndex = clonedItems.findIndex(({ id }) => id === dragId);
+
+    const activeTreeItem = clonedItems[activeIndex];
+    clonedItems[activeIndex] = { ...activeTreeItem, depth, parentId };
+
+    const sortedItems = arrayMove(clonedItems, activeIndex, overIndex);
+    const newItems = buildTree(sortedItems);
+
+    setItems(newItems);
+  };
 
   return (
     <div
@@ -99,26 +88,22 @@ export function MenuBuilder({
       }}
     >
       {flattenedItems.map(
-        ({ id, children, collapsed, depth, ...otherFields }) => (
+        ({ id, children, depth, ...otherFields }, index) => (
           <SortableTreeItem
             key={id}
             id={id}
-            updateitem={(id, data) => {
-              console.log("updateitem", id, data);
-              setItems((items) => updateItem(id, data, items));
-            }}
-            value={id}
+            items={items}
+            treeItem={{ id, children, depth, ...otherFields, index }}
+            index={index}
             otherfields={otherFields}
             depth={id === activeId && projected ? projected.depth : depth}
             indentationWidth={indentationWidth}
             indicator={style == "bordered"}
             childCount={getChildCount(items, activeId) + 1}
             onDragStart={handleDragStart}
-            onDragMove={handleDragMove}
             onDragOver={handleDragOver}
             onDragEnd={handleDragEnd}
-            onDragCancel={handleDragCancel}
-            onRemove={() => handleRemove(id)}
+            onDragHover={handleOnHover}
           />
         )
       )}
@@ -127,38 +112,44 @@ export function MenuBuilder({
 
   function handleDragStart({ active: { id: aId } }) {
     if (activeId === aId || overId === aId) return;
+    dragData.current = { dragId: aId, hoverId: aId };
     setActiveId(aId);
     setOverId(aId);
   }
 
-  function handleDragMove(deltaX) {
+  function handleDragOver(deltaX, id) {
     setOffsetLeft(deltaX);
+
+    if (overId === id) return;
+    setOverId(id ?? null);
   }
 
-  function handleDragOver({ over }) {
-    setOverId(over?.id ?? null);
-  }
+  // function handleDragMove(deltaX) {
+  //   setOffsetLeft(deltaX);
+  // }
 
-  function handleDragEnd({ active, over }) {
-    resetState();
-
+  // function handleDragEnd(active, over) {
+  function handleDragEnd() {
+    const active = { id: activeId };
+    const over = { id: overId };
     if (projected && over) {
       const { depth, parentId } = projected;
+
       const clonedItems = JSON.parse(JSON.stringify(flattenTree(items)));
+
       const overIndex = clonedItems.findIndex(({ id }) => id === over.id);
       const activeIndex = clonedItems.findIndex(({ id }) => id === active.id);
-      const activeTreeItem = clonedItems[activeIndex];
 
+      const activeTreeItem = clonedItems[activeIndex];
       clonedItems[activeIndex] = { ...activeTreeItem, depth, parentId };
 
       const sortedItems = arrayMove(clonedItems, activeIndex, overIndex);
       const newItems = buildTree(sortedItems);
 
+      console.log(newItems);
       setItems(newItems);
     }
-  }
 
-  function handleDragCancel() {
     resetState();
   }
 
@@ -166,21 +157,8 @@ export function MenuBuilder({
     setOverId(null);
     setActiveId(null);
     setOffsetLeft(0);
-    // setCurrentPosition(null);
-
-    document.body.style.setProperty("cursor", "");
-  }
-
-  function handleRemove(id) {
-    setItems((items) => removeItem(items, id));
   }
 }
-
-const adjustTranslate = ({ transform }) => {
-  return {
-    ...transform,
-  };
-};
 
 const generateItemChildren = (items) => {
   return items.map((item) => {
