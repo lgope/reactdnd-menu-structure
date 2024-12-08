@@ -1,9 +1,8 @@
 import React, { useEffect, useRef } from "react";
 import classNames from "classnames";
 import { useDrag, useDrop } from "react-dnd";
-import { INDENTATION_WIDTH } from "../../utilities";
+import { INDENTATION_WIDTH, ITEM_TYPE } from "../utilities";
 import { getEmptyImage } from "react-dnd-html5-backend";
-const item_type = "tree-item";
 
 export const TreeItem = ({
   id,
@@ -25,7 +24,7 @@ export const TreeItem = ({
   const dndRef = useRef(null);
 
   const [{ handlerId }, setDroppableNodeRef] = useDrop({
-    accept: [item_type],
+    accept: [ITEM_TYPE],
     collect(monitor) {
       return { handlerId: monitor.getHandlerId() };
     },
@@ -48,9 +47,9 @@ export const TreeItem = ({
   });
 
   const [{ isDragging }, setDraggableNodeRef, setPreviewRef] = useDrag({
-    type: item_type,
+    type: ITEM_TYPE,
     item: () => {
-      return { type: item_type, id, depth, index, ...treeItem };
+      return { type: ITEM_TYPE, id, depth, index, ...treeItem };
     },
     collect: (monitor) => {
       const isDragging = monitor.isDragging();

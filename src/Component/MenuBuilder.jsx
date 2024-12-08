@@ -8,8 +8,9 @@ import {
   removeChildrenOf,
   arrayMove,
 } from "./utilities";
-import { SortableTreeItem } from "./components";
-import { CustomDragLayer } from "./components/CustomDragLayer";
+
+import { SortableTreeItem } from "./TreeItem";
+import CustomDragLayer from "./CustomDragLayer";
 
 export function MenuBuilder({
   style = "bordered",

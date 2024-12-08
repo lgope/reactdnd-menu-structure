@@ -1,6 +1,6 @@
 import { useDragLayer } from "react-dnd";
 import { SortableTreeItem } from "./TreeItem";
-import { INDENTATION_WIDTH, getChildCount, getChildrens } from "../utilities";
+import { INDENTATION_WIDTH, getChildCount, getChildrens } from "./utilities";
 
 const layerStyles = {
   position: "fixed",
@@ -28,7 +28,7 @@ const getItemStyles = (initialOffset, currentOffset, depth) => {
   };
 };
 
-export const CustomDragLayer = ({ menuitems }) => {
+const CustomDragLayer = ({ menuitems }) => {
   const { isDragging, item, initialOffset, currentOffset } = useDragLayer(
     (monitor) => ({
       item: monitor.getItem(),
@@ -59,3 +59,5 @@ export const CustomDragLayer = ({ menuitems }) => {
     </div>
   );
 };
+
+export default CustomDragLayer;

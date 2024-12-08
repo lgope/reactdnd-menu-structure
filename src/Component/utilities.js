@@ -1,32 +1,7 @@
-import cloneDeep from "lodash/cloneDeep";
 import update from "immutability-helper";
 
-// export function arrayMove(array, from, to) {
-//   const newArray = array.slice();
-//   newArray.splice(
-//     to < 0 ? newArray.length + to : to,
-//     0,
-//     newArray.splice(from, 1)[0]
-//   );
-
-//   return newArray;
-// }
-
-// export const arrayMove = (prevArray, dragIndex, dropIndex) => {
-//   if (dragIndex === dropIndex) return prevArray;
-//   let temp_arr = cloneDeep(prevArray);
-//   if (dragIndex > dropIndex) {
-//     let temp = temp_arr[dragIndex];
-//     prevArray.splice(dragIndex, 1);
-//     prevArray.splice(dropIndex, 0, temp);
-//   } else {
-//     prevArray.splice(dropIndex + 1, 0, temp_arr[dragIndex]);
-//     prevArray.splice(dragIndex, 1);
-//   }
-//   return prevArray;
-// };
-
 export const INDENTATION_WIDTH = 50;
+export const ITEM_TYPE = "tree-item";
 
 /**
  *
@@ -39,7 +14,6 @@ export const INDENTATION_WIDTH = 50;
  * const array = ['a', 'b', 'c', 'd', 'e'];
  * console.log(arrayMove(array, -1, 1)); // ['a', 'e', 'b', 'c', 'd']
  */
-
 export const arrayMove = (array, from, to) => {
   const length = array.length;
   const fromIndex = ((from % length) + length) % length;
@@ -177,39 +151,6 @@ export function findItemDeep(items, itemId) {
   }
 
   return undefined;
-}
-
-export function removeItem(items, id) {
-  const newItems = [];
-
-  for (const item of items) {
-    if (item.id === id) {
-      continue;
-    }
-
-    if (item.children.length) {
-      item.children = removeItem(item.children, id);
-    }
-
-    newItems.push(item);
-  }
-
-  return newItems;
-}
-
-export function setProperty(items, id, property, setter) {
-  for (const item of items) {
-    if (item.id === id) {
-      item[property] = setter(item[property]);
-      continue;
-    }
-
-    if (item.children.length) {
-      item.children = setProperty(item.children, id, property, setter);
-    }
-  }
-
-  return [...items];
 }
 
 function countChildren(items, count = 0) {

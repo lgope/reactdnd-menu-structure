@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./App.css";
-import { MenuBuilder } from "./Builder/MenuBuilder";
+import { MenuBuilder } from "./Component/MenuBuilder";
 
 const initMenus = [
   {
@@ -64,7 +64,7 @@ function App() {
 
   return (
     <div>
-      <h1>Main</h1>
+      <h1>Wordpress like menu structure</h1>
       <br />
       <hr />
       <br />
