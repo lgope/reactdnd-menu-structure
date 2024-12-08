@@ -26,6 +26,8 @@ import update from "immutability-helper";
 //   return prevArray;
 // };
 
+export const INDENTATION_WIDTH = 50;
+
 /**
  *
  * @param {*} array
@@ -51,17 +53,11 @@ export const arrayMove = (array, from, to) => {
   });
 };
 
-function getDragDepth(offset, indentationWidth) {
-  return Math.round(offset / indentationWidth);
+function getDragDepth(offset) {
+  return Math.round(offset / INDENTATION_WIDTH);
 }
 
-export function getProjection(
-  items,
-  activeId,
-  overId,
-  dragOffset,
-  indentationWidth
-) {
+export function getProjection(items, activeId, overId, dragOffset) {
   const overItemIndex = items.findIndex(({ id }) => id === overId);
   const activeItemIndex = items.findIndex(({ id }) => id === activeId);
 
@@ -71,7 +67,7 @@ export function getProjection(
   const previousItem = newItems[overItemIndex - 1];
   const nextItem = newItems[overItemIndex + 1];
 
-  const dragDepth = getDragDepth(dragOffset, indentationWidth);
+  const dragDepth = getDragDepth(dragOffset, INDENTATION_WIDTH);
 
   const projectedDepth = activeItem.depth + dragDepth;
 

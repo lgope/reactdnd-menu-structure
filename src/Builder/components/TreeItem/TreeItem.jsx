@@ -1,20 +1,19 @@
-import React, { forwardRef, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import classNames from "classnames";
 import { useDrag, useDrop } from "react-dnd";
-import { getChildCount, getChildrens, getProjection } from "../../utilities";
+import { INDENTATION_WIDTH } from "../../utilities";
+import { getEmptyImage } from "react-dnd-html5-backend";
 const item_type = "tree-item";
 
 export const TreeItem = ({
   id,
   childCount,
   treeItem,
-  // flattenedItems,
   items,
   index,
   clone,
   depth,
   disableInteraction,
-  indentationWidth,
   indicator,
   style,
   onDragStart,
@@ -43,13 +42,12 @@ export const TreeItem = ({
       onDragOver(deltaX, treeItem.id);
 
       if (monitor.isOver({ shallow: true }) && item.id !== treeItem.id) {
-        console.log("hovering");
         onDragHover(item.id, treeItem.id, deltaX);
       }
     },
   });
 
-  const [{ isDragging }, setDraggableNodeRef] = useDrag({
+  const [{ isDragging }, setDraggableNodeRef, setPreviewRef] = useDrag({
     type: item_type,
     item: () => {
       return { type: item_type, id, depth, index, ...treeItem };
@@ -64,19 +62,9 @@ export const TreeItem = ({
     },
   });
 
-  const renderChildOnDraging = () => {
-    const childs = getChildrens(items, treeItem.id);
-    const childCount = getChildCount(items, treeItem.id) + 1;
-
-    return (
-      <div className={"Count"}>
-        {childs &&
-          childs.map((child) => {
-            return <RecursiveItem child={child} key={child.id} nDepth={1} />;
-          })}
-      </div>
-    );
-  };
+  useEffect(() => {
+    setPreviewRef(getEmptyImage(), { captureDraggingState: true });
+  }, []);
 
   setDraggableNodeRef(setDroppableNodeRef(dndRef));
 
@@ -93,7 +81,7 @@ export const TreeItem = ({
       style={{
         ...(!clone
           ? {
-              paddingLeft: `${indentationWidth * depth}px`,
+              paddingLeft: `${INDENTATION_WIDTH * depth}px`,
             }
           : {}),
       }}
@@ -124,7 +112,16 @@ export const TreeItem = ({
           </span>
         </span>
 
-        {isDragging ? renderChildOnDraging() : null}
+        {clone && childCount && childCount > 1 ? (
+          <div className={"Count"}>
+            {props.childs &&
+              props.childs.map((child) => {
+                return (
+                  <RecursiveItem child={child} key={child.id} nDepth={1} />
+                );
+              })}
+          </div>
+        ) : null}
       </div>
     </li>
   );

@@ -1,17 +1,15 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 import {
   buildTree,
   flattenTree,
   getProjection,
   getChildCount,
-  removeItem,
   removeChildrenOf,
-  setProperty,
-  getChildrens,
   arrayMove,
 } from "./utilities";
 import { SortableTreeItem } from "./components";
+import { CustomDragLayer } from "./components/CustomDragLayer";
 
 export function MenuBuilder({
   style = "bordered",
@@ -19,7 +17,6 @@ export function MenuBuilder({
   setItems,
 }) {
   const items = generateItemChildren(itemsProps);
-  const indentationWidth = 50;
   const [activeId, setActiveId] = useState(null);
   const [overId, setOverId] = useState(null);
   const [offsetLeft, setOffsetLeft] = useState(0);
@@ -45,13 +42,7 @@ export function MenuBuilder({
 
   let projected =
     activeId && overId
-      ? getProjection(
-          flattenedItems,
-          activeId,
-          overId,
-          offsetLeft,
-          indentationWidth
-        )
+      ? getProjection(flattenedItems, activeId, overId, offsetLeft)
       : null;
 
   const handleOnHover = (dragId, hoverId, deltaX) => {
@@ -60,8 +51,7 @@ export function MenuBuilder({
       flattenedItems,
       dragId,
       hoverId,
-      deltaX,
-      indentationWidth
+      deltaX
     );
 
     projected = { depth, parentId };
@@ -87,26 +77,25 @@ export function MenuBuilder({
         flexDirection: "column",
       }}
     >
-      {flattenedItems.map(
-        ({ id, children, depth, ...otherFields }, index) => (
-          <SortableTreeItem
-            key={id}
-            id={id}
-            items={items}
-            treeItem={{ id, children, depth, ...otherFields, index }}
-            index={index}
-            otherfields={otherFields}
-            depth={id === activeId && projected ? projected.depth : depth}
-            indentationWidth={indentationWidth}
-            indicator={style == "bordered"}
-            childCount={getChildCount(items, activeId) + 1}
-            onDragStart={handleDragStart}
-            onDragOver={handleDragOver}
-            onDragEnd={handleDragEnd}
-            onDragHover={handleOnHover}
-          />
-        )
-      )}
+      {flattenedItems.map(({ id, children, depth, ...otherFields }, index) => (
+        <SortableTreeItem
+          key={id}
+          id={id}
+          items={items}
+          treeItem={{ id, children, depth, ...otherFields, index }}
+          index={index}
+          otherfields={otherFields}
+          depth={id === activeId && projected ? projected.depth : depth}
+          indicator={style == "bordered"}
+          childCount={getChildCount(items, activeId) + 1}
+          onDragStart={handleDragStart}
+          onDragOver={handleDragOver}
+          onDragEnd={handleDragEnd}
+          onDragHover={handleOnHover}
+        />
+      ))}
+
+      <CustomDragLayer menuitems={items} />
     </div>
   );
 
@@ -124,11 +113,6 @@ export function MenuBuilder({
     setOverId(id ?? null);
   }
 
-  // function handleDragMove(deltaX) {
-  //   setOffsetLeft(deltaX);
-  // }
-
-  // function handleDragEnd(active, over) {
   function handleDragEnd() {
     const active = { id: activeId };
     const over = { id: overId };
@@ -146,7 +130,6 @@ export function MenuBuilder({
       const sortedItems = arrayMove(clonedItems, activeIndex, overIndex);
       const newItems = buildTree(sortedItems);
 
-      console.log(newItems);
       setItems(newItems);
     }
 
