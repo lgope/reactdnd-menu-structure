@@ -1,7 +1,11 @@
 import React, { useEffect, useRef } from "react";
 import classNames from "classnames";
 import { useDrag, useDrop } from "react-dnd";
-import { INDENTATION_WIDTH, ITEM_TYPE } from "../utilities";
+import {
+  INDENTATION_WIDTH,
+  ITEM_TYPE,
+  getPrevSiblingDeepChildCount,
+} from "../utilities";
 import { getEmptyImage } from "react-dnd-html5-backend";
 
 export const TreeItem = ({
@@ -67,10 +71,26 @@ export const TreeItem = ({
 
   setDraggableNodeRef(setDroppableNodeRef(dndRef));
 
+  const getBranchPathHeight = () => {
+    if (treeItem?.parentId) {
+      const prevSiblingDeepChildCount = getPrevSiblingDeepChildCount(
+        items,
+        treeItem.id
+      );
+
+      return `${prevSiblingDeepChildCount * 50}px`;
+    }
+
+    return "0px";
+  };
+
+  const branchPathHeight = getBranchPathHeight();
+
   return (
     <li
       ref={dndRef}
       data-handler-id={handlerId}
+      data-depth={depth}
       className={classNames({
         Wrapper: true,
         dragging: isDragging,
@@ -96,6 +116,13 @@ export const TreeItem = ({
               : "42px",
         }}
       >
+        <span
+          className="navigation-item-path"
+          style={{
+            height: branchPathHeight,
+            display: treeItem?.parentId ? "block" : "none",
+          }}
+        ></span>
         <span className={"Text"}>
           {props?.otherfields?.name}{" "}
           <span

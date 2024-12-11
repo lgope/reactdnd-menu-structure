@@ -189,3 +189,37 @@ export function removeChildrenOf(items, ids) {
     return true;
   });
 }
+
+export const findPrevSibling = (items, item) => {
+  const parent = findItemDeep(items, item.parentId);
+
+  if (!parent) {
+    return null;
+  }
+
+  const index = parent.children.findIndex(({ id }) => id === item.id);
+
+  return parent.children[index - 1];
+};
+
+export const getPrevSiblingDeepChildCount = (items, currItemId) => {
+  const currItem = findItemDeep(items, currItemId);
+  const prevSibling = findPrevSibling(items, currItem);
+
+  if (!prevSibling) {
+    return 0;
+  }
+
+  return countChildren(prevSibling.children) + 1;
+};
+
+// check it out
+export const getDistanceFromPerent = (
+  flattenedItems,
+  parentId,
+  currItemIndex
+) => {
+  const prentItemIndex = flattenedItems.findIndex(({ id }) => id === parentId);
+
+  return currItemIndex - prentItemIndex;
+};

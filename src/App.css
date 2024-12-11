@@ -136,3 +136,19 @@
     animation: logo-spin infinite 20s linear;
   }
 }
+
+.navigation-item-path {
+  display: block;
+  position: absolute;
+  width: 30px;
+  min-height: 50px;
+  bottom: 50%;
+  left: -12px;
+  border: 1px solid #565656;
+  border-top: 0;
+  border-right: 0;
+  padding: 4px 0 0;
+  padding-top: 3px;
+  border-bottom-left-radius: 6px;
+  z-index: -1;
+}
