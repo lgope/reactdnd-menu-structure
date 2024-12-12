@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 
 import {
   buildTree,
@@ -7,28 +7,20 @@ import {
   getChildCount,
   removeChildrenOf,
   arrayMove,
+  getPrevSiblingDeepChildCount,
 } from "./utilities";
 
-import { SortableTreeItem } from "./TreeItem";
 import CustomDragLayer from "./CustomDragLayer";
+import { MenuItem } from "./Menu/MenuItem";
 
-export function MenuBuilder({
-  style = "bordered",
-  items: itemsProps,
-  setItems,
-}) {
-  const items = generateItemChildren(itemsProps);
+export function MenuBuilder({ items: itemsProps, setItems }) {
+  const menuList = generateItemChildren(itemsProps);
   const [activeId, setActiveId] = useState(null);
   const [overId, setOverId] = useState(null);
   const [offsetLeft, setOffsetLeft] = useState(0);
 
-  const dragData = useRef({
-    dragId: null,
-    hoverId: null,
-  });
-
-  const flattenedItems = useMemo(() => {
-    const flattenedTree = flattenTree(items);
+  const flattenedMenus = useMemo(() => {
+    const flattenedTree = flattenTree(menuList);
     const collapsedItems = flattenedTree.reduce(
       (acc, { children, collapsed, id }) =>
         collapsed && children.length ? [...acc, id] : acc,
@@ -39,17 +31,16 @@ export function MenuBuilder({
       flattenedTree,
       activeId ? [activeId, ...collapsedItems] : collapsedItems
     );
-  }, [activeId, items]);
+  }, [activeId, menuList]);
 
   let projected =
     activeId && overId
-      ? getProjection(flattenedItems, activeId, overId, offsetLeft)
+      ? getProjection(flattenedMenus, activeId, overId, offsetLeft)
       : null;
 
   const handleOnHover = (dragId, hoverId, deltaX) => {
-    dragData.current = { ...dragData.current, hoverId };
     const { depth, parentId } = getProjection(
-      flattenedItems,
+      flattenedMenus,
       dragId,
       hoverId,
       deltaX
@@ -57,7 +48,7 @@ export function MenuBuilder({
 
     projected = { depth, parentId };
 
-    const clonedItems = JSON.parse(JSON.stringify(flattenTree(items)));
+    const clonedItems = JSON.parse(JSON.stringify(flattenTree(menuList)));
 
     const overIndex = clonedItems.findIndex(({ id }) => id === hoverId);
     const activeIndex = clonedItems.findIndex(({ id }) => id === dragId);
@@ -71,6 +62,19 @@ export function MenuBuilder({
     setItems(newItems);
   };
 
+  const getBranchPathHeight = (menu) => {
+    if (menu?.parentId) {
+      const prevSiblingDeepChildCount = getPrevSiblingDeepChildCount(
+        menuList,
+        menu.id
+      );
+
+      return `${prevSiblingDeepChildCount * 50}px`;
+    }
+
+    return "0px";
+  };
+
   return (
     <div
       style={{
@@ -78,17 +82,19 @@ export function MenuBuilder({
         flexDirection: "column",
       }}
     >
-      {flattenedItems.map(({ id, children, depth, ...otherFields }, index) => (
-        <SortableTreeItem
-          key={id}
-          id={id}
-          items={items}
-          treeItem={{ id, children, depth, ...otherFields, index }}
+      {flattenedMenus.map((menu, index) => (
+        <MenuItem
+          key={menu.id}
+          id={menu.id}
+          menu={menu}
+          activeId={activeId}
           index={index}
-          otherfields={otherFields}
-          depth={id === activeId && projected ? projected.depth : depth}
-          indicator={style == "bordered"}
-          childCount={getChildCount(items, activeId) + 1}
+          depth={
+            menu.id === activeId && projected ? projected.depth : menu.depth
+          }
+          childCount={getChildCount(menuList, activeId) + 1}
+          branchPathHeight={getBranchPathHeight(menu)}
+          // Drag and Drop
           onDragStart={handleDragStart}
           onDragOver={handleDragOver}
           onDragEnd={handleDragEnd}
@@ -96,13 +102,12 @@ export function MenuBuilder({
         />
       ))}
 
-      <CustomDragLayer menuitems={items} />
+      <CustomDragLayer menuitems={menuList} />
     </div>
   );
 
   function handleDragStart({ active: { id: aId } }) {
     if (activeId === aId || overId === aId) return;
-    dragData.current = { dragId: aId, hoverId: aId };
     setActiveId(aId);
     setOverId(aId);
   }
@@ -120,7 +125,7 @@ export function MenuBuilder({
     if (projected && over) {
       const { depth, parentId } = projected;
 
-      const clonedItems = JSON.parse(JSON.stringify(flattenTree(items)));
+      const clonedItems = JSON.parse(JSON.stringify(flattenTree(menuList)));
 
       const overIndex = clonedItems.findIndex(({ id }) => id === over.id);
       const activeIndex = clonedItems.findIndex(({ id }) => id === active.id);
@@ -144,11 +149,11 @@ export function MenuBuilder({
   }
 }
 
-const generateItemChildren = (items) => {
-  return items.map((item) => {
+const generateItemChildren = (menuList) => {
+  return menuList.map((menu) => {
     return {
-      ...item,
-      children: item?.children ? generateItemChildren(item.children) : [],
+      ...menu,
+      children: menu?.children ? generateItemChildren(menu.children) : [],
     };
   });
 };

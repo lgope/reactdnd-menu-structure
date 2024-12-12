@@ -1,6 +1,6 @@
 import { useDragLayer } from "react-dnd";
-import { SortableTreeItem } from "./TreeItem";
 import { INDENTATION_WIDTH, getChildCount, getChildrens } from "./utilities";
+import { MenuItem } from "./Menu/MenuItem";
 
 const layerStyles = {
   position: "fixed",
@@ -46,13 +46,14 @@ const CustomDragLayer = ({ menuitems }) => {
   return (
     <div style={layerStyles}>
       <div style={getItemStyles(initialOffset, currentOffset, item.depth)}>
-        <SortableTreeItem
+        <MenuItem
           id={item.id}
           depth={item.depth}
           clone
           childCount={getChildCount(menuitems, item.id) + 1}
           value={item.id.toString()}
           otherfields={item}
+          menu={item}
           childs={getChildrens(menuitems, item.id)}
         />
       </div>

@@ -1,24 +1,21 @@
 import React, { useEffect, useRef } from "react";
 import classNames from "classnames";
 import { useDrag, useDrop } from "react-dnd";
-import {
-  INDENTATION_WIDTH,
-  ITEM_TYPE,
-  getPrevSiblingDeepChildCount,
-} from "../utilities";
+import { INDENTATION_WIDTH, ITEM_TYPE } from "../utilities";
 import { getEmptyImage } from "react-dnd-html5-backend";
 
-export const TreeItem = ({
-  id,
+export const MenuItem = ({
+  menu,
   childCount,
   treeItem,
-  items,
+  activeId,
   index,
-  clone,
+  clone = false,
   depth,
-  disableInteraction,
-  indicator,
-  style,
+
+  branchPathHeight = "0px",
+
+  // drag and drop handlers
   onDragStart,
   onDragOver,
   onDragEnd,
@@ -33,7 +30,7 @@ export const TreeItem = ({
       return { handlerId: monitor.getHandlerId() };
     },
     drop: (item) => {
-      onDragEnd({ id: item.id }, { id: treeItem.id });
+      onDragEnd({ id: item.id }, { id: menu.id });
     },
 
     hover: (item, monitor) => {
@@ -42,10 +39,10 @@ export const TreeItem = ({
       }
 
       const deltaX = monitor.getDifferenceFromInitialOffset().x;
-      onDragOver(deltaX, treeItem.id);
+      onDragOver(deltaX, menu.id);
 
-      if (monitor.isOver({ shallow: true }) && item.id !== treeItem.id) {
-        onDragHover(item.id, treeItem.id, deltaX);
+      if (monitor.isOver({ shallow: true }) && item.id !== menu.id) {
+        onDragHover(item.id, menu.id, deltaX);
       }
     },
   });
@@ -53,12 +50,12 @@ export const TreeItem = ({
   const [{ isDragging }, setDraggableNodeRef, setPreviewRef] = useDrag({
     type: ITEM_TYPE,
     item: () => {
-      return { type: ITEM_TYPE, id, depth, index, ...treeItem };
+      return { type: ITEM_TYPE, depth, index, ...menu };
     },
     collect: (monitor) => {
       const isDragging = monitor.isDragging();
       if (isDragging) {
-        onDragStart({ active: { id: treeItem.id } });
+        onDragStart({ active: { id: menu.id } });
       }
 
       return { isDragging };
@@ -71,21 +68,6 @@ export const TreeItem = ({
 
   setDraggableNodeRef(setDroppableNodeRef(dndRef));
 
-  const getBranchPathHeight = () => {
-    if (treeItem?.parentId) {
-      const prevSiblingDeepChildCount = getPrevSiblingDeepChildCount(
-        items,
-        treeItem.id
-      );
-
-      return `${prevSiblingDeepChildCount * 50}px`;
-    }
-
-    return "0px";
-  };
-
-  const branchPathHeight = getBranchPathHeight();
-
   return (
     <li
       ref={dndRef}
@@ -94,8 +76,6 @@ export const TreeItem = ({
       className={classNames({
         Wrapper: true,
         dragging: isDragging,
-        indicator: indicator,
-        disableInteraction: disableInteraction,
       })}
       style={{
         ...(!clone
@@ -109,9 +89,8 @@ export const TreeItem = ({
       <div
         className="TreeItem"
         style={{
-          ...style,
           height:
-            isDragging && indicator && childCount
+            isDragging && childCount
               ? `${childCount * 42 + (childCount - 1) * 9}px`
               : "42px",
         }}
@@ -120,11 +99,11 @@ export const TreeItem = ({
           className="navigation-item-path"
           style={{
             height: branchPathHeight,
-            display: treeItem?.parentId ? "block" : "none",
+            display: activeId || clone ? "none" : menu?.parentId ? "block" : "none",
           }}
         ></span>
         <span className={"Text"}>
-          {props?.otherfields?.name}{" "}
+          {menu?.name}{" "}
           <span
             style={{
               fontSize: "13px",

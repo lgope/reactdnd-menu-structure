@@ -27,14 +27,14 @@
   min-width: 414px;
 }
 
-.Wrapper.dragging.indicator {
+.Wrapper.dragging {
   opacity: 1;
   position: relative;
   z-index: 1;
   margin-bottom: -1px;
 }
 
-.Wrapper.dragging.indicator .TreeItem {
+.Wrapper.dragging .TreeItem {
   position: relative;
   width: "100%";
   max-width: 414px;
@@ -45,13 +45,9 @@
   background-color: #fff;
 }
 
-.Wrapper.dragging.indicator .TreeItem > * {
+.Wrapper.dragging .TreeItem > * {
   opacity: 0;
   height: 0;
-}
-
-.Wrapper.dragging:not(.indicator) {
-  opacity: 0.5;
 }
 
 .Wrapper.dragging .TreeItem > * {
@@ -98,11 +94,6 @@
   left: 0;
   display: flex;
   flex-direction: column;
-}
-
-/* Disable Interaction styles */
-.disableInteraction {
-  pointer-events: none;
 }
 
 /* Disable Selection styles */
