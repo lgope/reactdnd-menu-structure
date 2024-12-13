@@ -11,7 +11,10 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "git-add-dist": "git add dist -f",
+    "git-dist-commit": "git commit -m 'updated dist'",
+    "git-push-dist": "git subtree push --prefix dist origin gh-pages"
   },
   "repository": {
     "type": "git",
