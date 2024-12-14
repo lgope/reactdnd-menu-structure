@@ -51,8 +51,6 @@ const CustomDragLayer = ({ menuitems }) => {
           depth={item.depth}
           clone
           childCount={getChildCount(menuitems, item.id) + 1}
-          value={item.id.toString()}
-          otherfields={item}
           menu={item}
           childs={getChildrens(menuitems, item.id)}
         />

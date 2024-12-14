@@ -74,8 +74,9 @@ export const MenuItem = ({
       data-handler-id={handlerId}
       data-depth={depth}
       className={classNames({
-        Wrapper: true,
-        dragging: isDragging,
+        [`${classPrefix}-item-wrapper`]: true,
+        [`${classPrefix}-item-dragging`]: isDragging,
+        // dragging: isDragging,
       })}
       style={{
         ...(!clone
@@ -83,9 +84,7 @@ export const MenuItem = ({
               paddingLeft: `${INDENTATION_WIDTH * depth}px`,
             }
           : {}),
-      }}
-      {...props}
-    >
+      }}>
       <div
         className="TreeItem"
         style={{
@@ -93,15 +92,14 @@ export const MenuItem = ({
             isDragging && childCount
               ? `${childCount * 42 + (childCount - 1) * 9}px`
               : "42px",
-        }}
-      >
+        }}>
         <span
           className="navigation-item-path"
           style={{
             height: branchPathHeight,
-            display: activeId || clone ? "none" : menu?.parentId ? "block" : "none",
-          }}
-        ></span>
+            display:
+              activeId || clone ? "none" : menu?.parentId ? "block" : "none",
+          }}></span>
         <span className={"Text"}>
           {menu?.name}{" "}
           <span
@@ -111,8 +109,7 @@ export const MenuItem = ({
               fontStyle: "italic",
               color: "#50575e",
               marginLeft: "4px",
-            }}
-          >
+            }}>
             {depth > 0 ? "sub item" : ""}
           </span>
         </span>
@@ -150,8 +147,7 @@ const RecursiveItem = (props) => {
           paddingLeft: "0.5rem",
           fontWeight: "600",
           fontSize: "13px",
-        }}
-      >
+        }}>
         {props.child.name}{" "}
         <span
           style={{
@@ -160,8 +156,7 @@ const RecursiveItem = (props) => {
             fontStyle: "italic",
             color: "#50575e",
             marginLeft: "4px",
-          }}
-        >
+          }}>
           sub item
         </span>
       </div>

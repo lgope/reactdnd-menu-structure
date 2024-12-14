@@ -13,8 +13,8 @@ import {
 import CustomDragLayer from "./CustomDragLayer";
 import { MenuItem } from "./Menu/MenuItem";
 
-export function MenuBuilder({ items: itemsProps, setItems }) {
-  const menuList = generateItemChildren(itemsProps);
+const MenuWrapper = ({ menus: menuData, setMenus }) => {
+  const menuList = generateItemChildren(menuData);
   const [activeId, setActiveId] = useState(null);
   const [overId, setOverId] = useState(null);
   const [offsetLeft, setOffsetLeft] = useState(0);
@@ -59,7 +59,7 @@ export function MenuBuilder({ items: itemsProps, setItems }) {
     const sortedItems = arrayMove(clonedItems, activeIndex, overIndex);
     const newItems = buildTree(sortedItems);
 
-    setItems(newItems);
+    setMenus(newItems);
   };
 
   const getBranchPathHeight = (menu) => {
@@ -76,12 +76,7 @@ export function MenuBuilder({ items: itemsProps, setItems }) {
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
+    <div className={`${classPrefix}-menu-wrapper`}>
       {flattenedMenus.map((menu, index) => (
         <MenuItem
           key={menu.id}
@@ -136,7 +131,7 @@ export function MenuBuilder({ items: itemsProps, setItems }) {
       const sortedItems = arrayMove(clonedItems, activeIndex, overIndex);
       const newItems = buildTree(sortedItems);
 
-      setItems(newItems);
+      setMenus(newItems);
     }
 
     resetState();
@@ -147,7 +142,7 @@ export function MenuBuilder({ items: itemsProps, setItems }) {
     setActiveId(null);
     setOffsetLeft(0);
   }
-}
+};
 
 const generateItemChildren = (menuList) => {
   return menuList.map((menu) => {
@@ -157,3 +152,5 @@ const generateItemChildren = (menuList) => {
     };
   });
 };
+
+export default MenuWrapper;
