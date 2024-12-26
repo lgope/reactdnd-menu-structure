@@ -27,12 +27,11 @@ export const MenuItem = ({
   const [{ handlerId }, setDroppableNodeRef] = useDrop({
     accept: [ITEM_TYPE],
     collect(monitor) {
-      return { handlerId: monitor.getHandlerId() };
+      return { handlerId: monitor.getHandlerId()};
     },
     drop: (item) => {
       onDragEnd({ id: item.id }, { id: menu.id });
     },
-
     hover: (item, monitor) => {
       if (!dndRef.current) {
         return;
@@ -55,7 +54,7 @@ export const MenuItem = ({
     collect: (monitor) => {
       const isDragging = monitor.isDragging();
       if (isDragging) {
-        onDragStart({ active: { id: menu.id } });
+        onDragStart(menu.id);
       }
 
       return { isDragging };

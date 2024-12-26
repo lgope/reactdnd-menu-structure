@@ -75,6 +75,49 @@ const MenuWrapper = ({ menus: menuData, setMenus }) => {
     return "0px";
   };
 
+  const handleDragStart = (menuId) => {
+    if (activeId === menuId || overId === menuId) return;
+    setActiveId(menuId);
+    setOverId(menuId);
+  };
+
+  const handleDragOver = (deltaX, id) => {
+    setOffsetLeft(deltaX);
+
+    if (overId === id) return;
+    setOverId(id ?? null);
+  };
+
+  const handleDragEnd = () => {
+    const active = { id: activeId };
+    const over = { id: overId };
+
+    if (projected && over) {
+      const { depth, parentId } = projected;
+
+      const clonedItems = JSON.parse(JSON.stringify(flattenTree(menuList)));
+
+      const overIndex = clonedItems.findIndex(({ id }) => id === over.id);
+      const activeIndex = clonedItems.findIndex(({ id }) => id === active.id);
+
+      const activeTreeItem = clonedItems[activeIndex];
+      clonedItems[activeIndex] = { ...activeTreeItem, depth, parentId };
+
+      const sortedItems = arrayMove(clonedItems, activeIndex, overIndex);
+      const newItems = buildTree(sortedItems);
+
+      setMenus(newItems);
+    }
+
+    resetState();
+  };
+
+  const resetState = () => {
+    setOverId(null);
+    setActiveId(null);
+    setOffsetLeft(0);
+  };
+
   return (
     <div className={`${classPrefix}-menu-wrapper`}>
       {flattenedMenus.map((menu, index) => (
@@ -100,48 +143,6 @@ const MenuWrapper = ({ menus: menuData, setMenus }) => {
       <CustomDragLayer menuitems={menuList} />
     </div>
   );
-
-  function handleDragStart({ active: { id: aId } }) {
-    if (activeId === aId || overId === aId) return;
-    setActiveId(aId);
-    setOverId(aId);
-  }
-
-  function handleDragOver(deltaX, id) {
-    setOffsetLeft(deltaX);
-
-    if (overId === id) return;
-    setOverId(id ?? null);
-  }
-
-  function handleDragEnd() {
-    const active = { id: activeId };
-    const over = { id: overId };
-    if (projected && over) {
-      const { depth, parentId } = projected;
-
-      const clonedItems = JSON.parse(JSON.stringify(flattenTree(menuList)));
-
-      const overIndex = clonedItems.findIndex(({ id }) => id === over.id);
-      const activeIndex = clonedItems.findIndex(({ id }) => id === active.id);
-
-      const activeTreeItem = clonedItems[activeIndex];
-      clonedItems[activeIndex] = { ...activeTreeItem, depth, parentId };
-
-      const sortedItems = arrayMove(clonedItems, activeIndex, overIndex);
-      const newItems = buildTree(sortedItems);
-
-      setMenus(newItems);
-    }
-
-    resetState();
-  }
-
-  function resetState() {
-    setOverId(null);
-    setActiveId(null);
-    setOffsetLeft(0);
-  }
 };
 
 const generateItemChildren = (menuList) => {
