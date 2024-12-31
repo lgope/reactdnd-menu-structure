@@ -13,6 +13,15 @@ import {
 import CustomDragLayer from "./CustomDragLayer";
 import { MenuItem } from "./Menu/MenuItem";
 
+const generateItemChildren = (menuList) => {
+  return menuList.map((menu) => {
+    return {
+      ...menu,
+      children: menu?.children ? generateItemChildren(menu.children) : [],
+    };
+  });
+};
+
 const MenuWrapper = ({ menus: menuData, setMenus }) => {
   const menuList = generateItemChildren(menuData);
   const [activeId, setActiveId] = useState(null);
@@ -33,10 +42,8 @@ const MenuWrapper = ({ menus: menuData, setMenus }) => {
     );
   }, [activeId, menuList]);
 
-  let projected =
-    activeId && overId
-      ? getProjection(flattenedMenus, activeId, overId, offsetLeft)
-      : null;
+  // This is the projected position of the dragged item over the hovered item. Initially set to null
+  let projected = null;
 
   const handleOnHover = (dragId, hoverId, deltaX) => {
     const { depth, parentId } = getProjection(
@@ -89,7 +96,6 @@ const MenuWrapper = ({ menus: menuData, setMenus }) => {
   };
 
   const handleDragEnd = () => {
-    const active = { id: activeId };
     const over = { id: overId };
 
     if (projected && over) {
@@ -98,7 +104,7 @@ const MenuWrapper = ({ menus: menuData, setMenus }) => {
       const clonedItems = JSON.parse(JSON.stringify(flattenTree(menuList)));
 
       const overIndex = clonedItems.findIndex(({ id }) => id === over.id);
-      const activeIndex = clonedItems.findIndex(({ id }) => id === active.id);
+      const activeIndex = clonedItems.findIndex(({ id }) => id === activeId);
 
       const activeTreeItem = clonedItems[activeIndex];
       clonedItems[activeIndex] = { ...activeTreeItem, depth, parentId };
@@ -118,6 +124,11 @@ const MenuWrapper = ({ menus: menuData, setMenus }) => {
     setOffsetLeft(0);
   };
 
+  // Get the projection of the dragged item over the hovered item
+  if (activeId && overId) {
+    projected = getProjection(flattenedMenus, activeId, overId, offsetLeft);
+  }
+
   return (
     <div className={`${classPrefix}-menu-wrapper`}>
       {flattenedMenus.map((menu, index) => (
@@ -132,7 +143,7 @@ const MenuWrapper = ({ menus: menuData, setMenus }) => {
           }
           childCount={getChildCount(menuList, activeId) + 1}
           branchPathHeight={getBranchPathHeight(menu)}
-          // Drag and Drop
+          // Drag and Drop handlers
           onDragStart={handleDragStart}
           onDragOver={handleDragOver}
           onDragEnd={handleDragEnd}
@@ -143,15 +154,6 @@ const MenuWrapper = ({ menus: menuData, setMenus }) => {
       <CustomDragLayer menuitems={menuList} />
     </div>
   );
-};
-
-const generateItemChildren = (menuList) => {
-  return menuList.map((menu) => {
-    return {
-      ...menu,
-      children: menu?.children ? generateItemChildren(menu.children) : [],
-    };
-  });
 };
 
 export default MenuWrapper;
