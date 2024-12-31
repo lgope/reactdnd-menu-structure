@@ -1,6 +1,6 @@
 import { useState } from "react";
-import "./App.css";
-import { MenuBuilder } from "./Component/MenuBuilder";
+import "./app.scss";
+import MenuWrapper from "./Component/MenuWrapper";
 
 const initMenus = [
   {
@@ -59,18 +59,18 @@ const initMenus = [
   },
 ];
 
-function App() {
+const App = () => {
   const [menus, setMenus] = useState(initMenus);
 
   return (
-    <div>
+    <div className={`${classPrefix}-app`}>
       <h1>Wordpress like menu structure</h1>
       <br />
       <hr />
       <br />
-      <MenuBuilder items={menus} setItems={setMenus} />
+      <MenuWrapper menus={menus} setMenus={setMenus} />
     </div>
   );
-}
+};
 
 export default App;

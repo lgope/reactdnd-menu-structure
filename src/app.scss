@@ -1,3 +1,5 @@
+$class-prefix: "lgmenu";
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -17,14 +19,14 @@ body {
 }
 
 /* Wrapper styles */
-.Wrapper {
+.#{$class-prefix}-item-wrapper {
   list-style: none;
   box-sizing: border-box;
   margin-bottom: -1px;
   -webkit-font-smoothing: subpixel-antialiased;
 }
 
-.Wrapper.clone {
+.#{$class-prefix}-item-wrapper.clone {
   display: inline-block;
   pointer-events: none;
   padding: 0;
@@ -32,7 +34,7 @@ body {
   padding-top: 5px;
 }
 
-.Wrapper.clone .TreeItem {
+.#{$class-prefix}-item-wrapper.clone .TreeItem {
   --vertical-padding: 5px;
   padding-right: 24px;
   border-radius: 4px;
@@ -41,14 +43,14 @@ body {
   min-width: 414px;
 }
 
-.Wrapper.dragging {
+.#{$class-prefix}-item-wrapper.#{$class-prefix}-item-dragging {
   opacity: 1;
   position: relative;
   z-index: 1;
   margin-bottom: -1px;
 }
 
-.Wrapper.dragging .TreeItem {
+.#{$class-prefix}-item-wrapper.#{$class-prefix}-item-dragging .TreeItem {
   position: relative;
   width: "100%";
   max-width: 414px;
@@ -59,12 +61,12 @@ body {
   background-color: #fff;
 }
 
-.Wrapper.dragging .TreeItem > * {
+.#{$class-prefix}-item-wrapper.#{$class-prefix}-item-dragging .TreeItem > * {
   opacity: 0;
   height: 0;
 }
 
-.Wrapper.dragging .TreeItem > * {
+.#{$class-prefix}-item-wrapper.#{$class-prefix}-item-dragging .TreeItem > * {
   box-shadow: none;
   background-color: transparent;
 }
@@ -108,38 +110,6 @@ body {
   left: 0;
   display: flex;
   flex-direction: column;
-}
-
-/* Disable Selection styles */
-.disableSelection,
-.clone .Text,
-.clone .Count {
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-/* Collapse styles */
-.Collapse svg {
-  transition: transform 250ms ease;
-}
-
-.Collapse.collapsed svg {
-  transform: rotate(-90deg);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
 }
 
 .navigation-item-path {
